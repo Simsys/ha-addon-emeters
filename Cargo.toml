@@ -1,0 +1,16 @@
+[package]
+name = "solar_control"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+rumqttc = "0.24.0"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+tokio = { version = "1.0", features = ["full"] }
+reqwest = { version = "0.13.3", features = ["json"] }
+chrono = { version = "0.4.44", features = ["serde"] }
+tokio-modbus = { version = "0.17.0", features = ["tcp"] }
+thiserror = "2.0.3"
+log = "0.4.30"
+env_logger = "0.11.10"

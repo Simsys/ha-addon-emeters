@@ -1,0 +1,30 @@
+name: "Solar Control"
+version: "0.1.0"
+slug: "solar_control"
+description: "Ein Addon, das E-Zähler abliest und die Solarenergie sinnvoll nutzt"
+arch:
+  - amd64
+init: false
+options:
+  log_level: "info"
+  indb_host: "http:\\<ip-address>:<Port>"
+  indb_user: "<user>"
+  indb_password: "<password>"
+
+  mqtt_host: "<ip-address>:<Port>"
+  mqtt_user: "<user>"
+  mqtt_password: "<password>"
+
+schema:
+  log_level: "list(info|debug|trace)"
+  indb_host: str
+  indb_user: str
+  indb_password: str
+
+  mqtt_host: str
+  mqtt_user: str
+  mqtt_password: str
+
+flags:
+  - password(indb_password)
+  - password(mqtt_password)
