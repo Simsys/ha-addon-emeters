@@ -139,7 +139,6 @@ impl Wallbox {
         let e_meter = EMeter::new(influxdb, WALLBOX_EMETER_CONFIG);
         let control = Control::new(
             influxdb,
-            WALLBOX_CONTROL_CONFIG_TOPIC,
             WALLBOX_CONTROL_CONFIG,
         );
         let car_control = CarControl::new();
@@ -271,9 +270,9 @@ impl Wallbox {
 }
 
 const WALLBOX_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
-    e_in: &TopicAndSensor {
+    e_in: &SensorConfig {
         topic: "homeassistant/sensor/simsys/e_meter_e_in_wallbox/config",
-        sensor: &Sensor {
+        payload: &Sensor {
             name: "Wallbox Energy",
             platform: "sensor",
             unique_id: "wallbox-energy-in",
@@ -288,9 +287,9 @@ const WALLBOX_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
             device: DEVICE,
         },
     },
-    e_out: &TopicAndSensor {
+    e_out: &SensorConfig {
         topic: "homeassistant/sensor/simsys/e_meter_e_out_wallbox/config",
-        sensor: &Sensor {
+        payload: &Sensor {
             name: "Wallbox Energy Output",
             platform: "sensor",
             unique_id: "wallbox-energy-out",
@@ -305,9 +304,9 @@ const WALLBOX_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
             device: DEVICE,
         },
     },
-    power: &TopicAndSensor {
+    power: &SensorConfig {
         topic: "homeassistant/sensor/simsys/e_meter_power_wallbox/config",
-        sensor: &Sensor {
+        payload: &Sensor {
             name: "Wallbox Power",
             platform: "sensor",
             unique_id: "wallbox-power",
@@ -322,9 +321,9 @@ const WALLBOX_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
             device: DEVICE,
         },
     },
-    sec_power: &TopicAndSensor {
+    sec_power: &SensorConfig {
         topic: "homeassistant/sensor/simsys/e_meter_sec_power_wallbox/config",
-        sensor: &Sensor {
+        payload: &Sensor {
             name: "Wallbox Sec Power",
             platform: "sensor",
             unique_id: "wallbox-sec-power",
@@ -351,21 +350,23 @@ const WALLBOX_CONN_CONFIC: &BinarySensor = &BinarySensor {
 };
 const WALLBOX_CONN_CONFIG_TOPIC: &str = "homeassistant/binary_sensor/simsys/connection_wallbox/config";
 
-const WALLBOX_CONTROL_CONFIG: &Sensor = &Sensor {
-    name: "Wallbox Control",
-    platform: "sensor",
-    unique_id: "wallbox-control",
-    enabled_by_default: true,
-    state_topic: "simsys/control/wallbox/state",
-    availability_topic: "simsys/e_meter/wallbox/avail",
-    unit_of_measurement: "W",
-    device_class: "power",
-    state_class: "measurement",
-    value_template: "{{ value_json.control_value }}",
-    suggested_display_precision: 0,
-    device: DEVICE,
+const WALLBOX_CONTROL_CONFIG: &SensorConfig = &SensorConfig {
+    topic: "homeassistant/sensor/simsys/control_wallbox/config",
+    payload: &Sensor {
+        name: "Wallbox Control",
+        platform: "sensor",
+        unique_id: "wallbox-control",
+        enabled_by_default: true,
+        state_topic: "simsys/control/wallbox/state",
+        availability_topic: "simsys/e_meter/wallbox/avail",
+        unit_of_measurement: "W",
+        device_class: "power",
+        state_class: "measurement",
+        value_template: "{{ value_json.control_value }}",
+        suggested_display_precision: 0,
+        device: DEVICE,
+    }
 };
-const WALLBOX_CONTROL_CONFIG_TOPIC: &str = "homeassistant/sensor/simsys/control_wallbox/config";
 
 const WALLBOX_NO_SOLAR_CONFIG: &Switch = &Switch {
     name: "Wallbox No Solar (always)",

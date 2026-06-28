@@ -11,28 +11,25 @@ pub struct Battery {
     tick: u32,
 
     influxdb: InfluxDb,
-    config_topic: &'static str,
-    config: &'static Sensor,
+    config: &'static SensorConfig,
 }
 
 impl Battery {
     pub fn new(
         influxdb: &InfluxDb,
-        config_topic: &'static str,
-        config: &'static Sensor,
+        config: &'static SensorConfig,
     ) -> Self {
         Battery {
             soc: 0.0,
             tick: 0,
             influxdb: influxdb.clone(),
-            config_topic,
             config,
         }
     }
 
     pub async fn power_up_msgs(&mut self) -> MqttMessages {
-        let payload = serde_json::to_string(self.config).unwrap();
-        let msg = MqttMessage::new(self.config_topic, payload)
+        let payload = serde_json::to_string(self.config.payload).unwrap();
+        let msg = MqttMessage::new(self.config.topic, payload)
             .set_qos(rumqttc::QoS::AtLeastOnce)
             .set_retain(true);
         let mut msgs = MqttMessages::from_msg(msg);
@@ -40,14 +37,14 @@ impl Battery {
         if let Ok(soc) = self
             .influxdb
             .get_value(
-                self.config.unique_id,
+                self.config.payload.unique_id,
                 PhysicalQuantity::Battery,
             )
             .await
         {
             trace!(
                 "Read from InfluxDb {}: {:.0} {}",
-                self.config.unique_id,
+                self.config.payload.unique_id,
                 soc,
                 PhysicalQuantity::Battery.unit()
             );
@@ -93,7 +90,7 @@ impl Battery {
     async fn set_soc(&mut self, soc: f64, write_to_db: bool) -> MqttMessage {
         self.soc = soc;
 
-        let sensor_id = self.config.unique_id;
+        let sensor_id = self.config.payload.unique_id;
         let quantity = PhysicalQuantity::Battery;
 
         if write_to_db {
@@ -107,7 +104,7 @@ impl Battery {
         }
 
         MqttMessage::new(
-            self.config.state_topic,
+            self.config.payload.state_topic,
             format!(r#"{{"soc": {}}}"#, self.soc.round()),
         )
     }

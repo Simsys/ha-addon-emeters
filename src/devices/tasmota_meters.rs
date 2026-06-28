@@ -126,9 +126,9 @@ struct Energy {
 }
 
 const Z1_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
-    e_in: &TopicAndSensor {
+    e_in: &SensorConfig {
         topic: "homeassistant/sensor/simsys/e_meter_e_in_z1/config",
-        sensor: &Sensor {
+        payload: &Sensor {
             name: "Home Energy",
             platform: "sensor",
             unique_id: "z1-energy-in",
@@ -143,9 +143,9 @@ const Z1_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
             device: DEVICE
         },
     },
-    e_out: &TopicAndSensor {
+    e_out: &SensorConfig {
         topic: "homeassistant/sensor/simsys/e_meter_e_out_z1/config",
-        sensor: &Sensor {
+        payload: &Sensor {
             name: "Home Energy Output",
             platform: "sensor",
             unique_id: "z1-energy-out",
@@ -160,9 +160,9 @@ const Z1_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
             device: DEVICE,
         },
     },
-    power: &TopicAndSensor {
+    power: &SensorConfig {
         topic: "homeassistant/sensor/simsys/e_meter_power_z1/config",
-        sensor: &Sensor {
+        payload: &Sensor {
             name: "Home Power",
             platform: "sensor",
             unique_id: "z1-power",
@@ -177,9 +177,9 @@ const Z1_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
             device: DEVICE,
         },
     },
-    sec_power: &TopicAndSensor {
+    sec_power: &SensorConfig {
         topic: "homeassistant/sensor/simsys/e_meter_sec_power_z1/config",
-        sensor: &Sensor {
+        payload: &Sensor {
             name: "Home Sec Power",
             platform: "sensor",
             unique_id: "z1-sec-power",
@@ -216,9 +216,9 @@ pub fn z1_emeter(influxdb: &InfluxDb) -> TasmotaMeter {
 }
 
 const Z2_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
-    e_in: &TopicAndSensor {
+    e_in: &SensorConfig {
         topic: "homeassistant/sensor/simsys/e_meter_e_in_z2/config",
-        sensor: &Sensor {
+        payload: &Sensor {
             name: "Home Energy",
             platform: "sensor",
             unique_id: "z2-energy-in",
@@ -233,9 +233,9 @@ const Z2_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
             device: DEVICE
         },
     },
-    e_out: &TopicAndSensor {
+    e_out: &SensorConfig {
         topic: "homeassistant/sensor/simsys/e_meter_e_out_z2/config",
-        sensor: &Sensor {
+        payload: &Sensor {
             name: "Home Energy Output",
             platform: "sensor",
             unique_id: "z2-energy-out",
@@ -250,9 +250,9 @@ const Z2_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
             device: DEVICE,
         },
     },
-    power: &TopicAndSensor {
+    power: &SensorConfig {
         topic: "homeassistant/sensor/simsys/e_meter_power_z2/config",
-        sensor: &Sensor {
+        payload: &Sensor {
             name: "Home Power",
             platform: "sensor",
             unique_id: "z2-power",
@@ -267,9 +267,9 @@ const Z2_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
             device: DEVICE,
         },
     },
-    sec_power: &TopicAndSensor {
+    sec_power: &SensorConfig {
         topic: "homeassistant/sensor/simsys/e_meter_sec_power_z2/config",
-        sensor: &Sensor {
+        payload: &Sensor {
             name: "Home Sec Power",
             platform: "sensor",
             unique_id: "z2-sec-power",
@@ -306,9 +306,9 @@ pub fn z2_emeter(influxdb: &InfluxDb) -> TasmotaMeter {
 }
 
 const Z3_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
-    e_in: &TopicAndSensor {
+    e_in: &SensorConfig {
         topic: "homeassistant/sensor/simsys/e_meter_e_in_z3/config",
-        sensor: &Sensor {
+        payload: &Sensor {
             name: "Home Energy",
             platform: "sensor",
             unique_id: "z3-energy-in",
@@ -323,9 +323,9 @@ const Z3_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
             device: DEVICE
         },
     },
-    e_out: &TopicAndSensor {
+    e_out: &SensorConfig {
         topic: "homeassistant/sensor/simsys/e_meter_e_out_z3/config",
-        sensor: &Sensor {
+        payload: &Sensor {
             name: "Home Energy Output",
             platform: "sensor",
             unique_id: "z3-energy-out",
@@ -340,9 +340,9 @@ const Z3_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
             device: DEVICE,
         },
     },
-    power: &TopicAndSensor {
+    power: &SensorConfig {
         topic: "homeassistant/sensor/simsys/e_meter_power_z3/config",
-        sensor: &Sensor {
+        payload: &Sensor {
             name: "Home Power",
             platform: "sensor",
             unique_id: "z3-power",
@@ -357,9 +357,9 @@ const Z3_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
             device: DEVICE,
         },
     },
-    sec_power: &TopicAndSensor {
+    sec_power: &SensorConfig {
         topic: "homeassistant/sensor/simsys/e_meter_sec_power_z3/config",
-        sensor: &Sensor {
+        payload: &Sensor {
             name: "Home Sec Power",
             platform: "sensor",
             unique_id: "z3-sec-power",

@@ -54,9 +54,9 @@ impl Heatpump {
 }
 
 const HEATPUMP_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
-    e_in: &TopicAndSensor { 
+    e_in: &SensorConfig { 
         topic: "homeassistant/sensor/simsys/e_meter_e_in_heatpump/config", 
-        sensor: &Sensor {
+        payload: &Sensor {
             name: "Heatpump Energy",
             platform: "sensor",
             unique_id: "heatpump-energy-in",
@@ -71,9 +71,9 @@ const HEATPUMP_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
             device: DEVICE,
         },
     },
-    e_out: &TopicAndSensor { 
+    e_out: &SensorConfig { 
         topic: "homeassistant/sensor/simsys/e_meter_e_out_heatpump/config", 
-        sensor: &Sensor {
+        payload: &Sensor {
             name: "Heatpump Energy Output",
             platform: "sensor",
             unique_id: "heatpump-energy-out",
@@ -88,9 +88,9 @@ const HEATPUMP_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
             device: DEVICE,
         },
     },
-    power: &TopicAndSensor { 
+    power: &SensorConfig { 
         topic: "homeassistant/sensor/simsys/e_meter_power_heatpump/config", 
-        sensor: &Sensor {
+        payload: &Sensor {
             name: "Heatpump Power",
             platform: "sensor",
             unique_id: "heatpump-power",
@@ -105,9 +105,9 @@ const HEATPUMP_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
             device: DEVICE,
         },
     },
-    sec_power: &TopicAndSensor { 
+    sec_power: &SensorConfig { 
         topic: "homeassistant/sensor/simsys/e_meter_sec_power_heatpump/config", 
-        sensor: &Sensor {
+        payload: &Sensor {
             name: "Heatpump Sec Power",
             platform: "sensor",
             unique_id: "heatpump-sec-power",

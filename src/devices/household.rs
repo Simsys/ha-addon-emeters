@@ -54,9 +54,9 @@ impl Household {
 }
 
 const HOUSEHOLD_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
-    e_in: &TopicAndSensor {
+    e_in: &SensorConfig {
         topic: "homeassistant/sensor/simsys/e_meter_e_in_household/config",
-        sensor: &Sensor {
+        payload: &Sensor {
             name: "Household Energy",
             platform: "sensor",
             unique_id: "household-energy-in",
@@ -71,9 +71,9 @@ const HOUSEHOLD_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
             device: DEVICE,
         },
     },
-    e_out: &TopicAndSensor {
+    e_out: &SensorConfig {
         topic: "homeassistant/sensor/simsys/e_meter_e_out_household/config",
-        sensor: &Sensor {
+        payload: &Sensor {
             name: "Household Energy Output",
             platform: "sensor",
             unique_id: "household-energy-out",
@@ -88,9 +88,9 @@ const HOUSEHOLD_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
             device: DEVICE,
         },
     },
-    power: &TopicAndSensor {
+    power: &SensorConfig {
         topic: "homeassistant/sensor/simsys/e_meter_power_household/config",
-        sensor: &Sensor {
+        payload: &Sensor {
             name: "Household Power",
             platform: "sensor",
             unique_id: "household-power",
@@ -105,9 +105,9 @@ const HOUSEHOLD_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
             device: DEVICE,
         },
     },
-    sec_power: &TopicAndSensor {
+    sec_power: &SensorConfig {
         topic: "homeassistant/sensor/simsys/e_meter_sec_power_household/config",
-        sensor: &Sensor {
+        payload: &Sensor {
             name: "Household Sec Power",
             platform: "sensor",
             unique_id: "household-sec-power",

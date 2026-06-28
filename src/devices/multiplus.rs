@@ -109,12 +109,10 @@ impl Multiplus {
         );
         let battery = Battery::new(
             influxdb,
-            MULTIPLUS_BATTERY_CONFIG_TOPIC,
             MULTIPLUS_BATTERY_CONFIG,
         );
         let control = Control::new(
             influxdb,
-            MULTIPLUS_CONTROL_CONFIG_TOPIC,
             MULTIPLUS_CONTROL_CONFIG,
         );
         let pi_controller = PiController::new(-0.65, 4.9, 1.0, -4000.0, 4000.0);
@@ -314,9 +312,9 @@ impl Multiplus {
 }
 
 const MULTIPLUS_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
-    e_in: &TopicAndSensor {
+    e_in: &SensorConfig {
         topic: "homeassistant/sensor/simsys/e_meter_e_in_multiplus/config",
-        sensor: &Sensor {
+        payload: &Sensor {
             name: "Multiplus Energy Charge",
             platform: "sensor",
             unique_id: "multiplus-energy-in",
@@ -331,9 +329,9 @@ const MULTIPLUS_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
             device: DEVICE,
         },
     },
-    e_out: &TopicAndSensor {
+    e_out: &SensorConfig {
         topic: "homeassistant/sensor/simsys/e_meter_e_out_multiplus/config",
-        sensor: &Sensor {
+        payload: &Sensor {
             name: "Multiplus Energy Discharge",
             platform: "sensor",
             unique_id: "multiplus-energy-out",
@@ -348,9 +346,9 @@ const MULTIPLUS_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
             device: DEVICE,
         },
     },
-    power: &TopicAndSensor {
+    power: &SensorConfig {
         topic: "homeassistant/sensor/simsys/e_meter_power_multiplus/config",
-        sensor: &Sensor {
+        payload: &Sensor {
             name: "Multiplus Power",
             platform: "sensor",
             unique_id: "multiplus-power",
@@ -365,9 +363,9 @@ const MULTIPLUS_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
             device: DEVICE,
         },
     },
-    sec_power: &TopicAndSensor {
+    sec_power: &SensorConfig {
         topic: "homeassistant/sensor/simsys/e_meter_sec_power_multiplus/config",
-        sensor: &Sensor {
+        payload: &Sensor {
             name: "Multiplus Sec Power",
             platform: "sensor",
             unique_id: "multiplus-sec-power",
@@ -384,37 +382,41 @@ const MULTIPLUS_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
     },
 };
 
-const MULTIPLUS_BATTERY_CONFIG: &Sensor = &Sensor {
-    name: "Multiplus State of Charge",
-    platform: "sensor",
-    unique_id: "multiplus-soc",
-    enabled_by_default: true,
-    state_topic: "simsys/battery/multiplus/state",
-    availability_topic: "simsys/e_meter/multiplus/avail",
-    unit_of_measurement: "%",
-    device_class: "battery",
-    state_class: "measurement",
-    value_template: "{{ value_json.soc }}",
-    suggested_display_precision: 0,
-    device: DEVICE,
+const MULTIPLUS_BATTERY_CONFIG: &SensorConfig = &SensorConfig {
+    topic: "homeassistant/sensor/simsys/battery_multiplus/config",
+    payload: &Sensor {
+        name: "Multiplus State of Charge",
+        platform: "sensor",
+        unique_id: "multiplus-soc",
+        enabled_by_default: true,
+        state_topic: "simsys/battery/multiplus/state",
+        availability_topic: "simsys/e_meter/multiplus/avail",
+        unit_of_measurement: "%",
+        device_class: "battery",
+        state_class: "measurement",
+        value_template: "{{ value_json.soc }}",
+        suggested_display_precision: 0,
+        device: DEVICE,
+    }
 };
-const MULTIPLUS_BATTERY_CONFIG_TOPIC: &str = "homeassistant/sensor/simsys/battery_multiplus/config";
 
-const MULTIPLUS_CONTROL_CONFIG: &Sensor = &Sensor {
-    name: "Multiplus Control",
-    platform: "sensor",
-    unique_id: "multiplus-control",
-    enabled_by_default: true,
-    state_topic: "simsys/control/multiplus/state",
-    availability_topic: "simsys/e_meter/multiplus/avail",
-    unit_of_measurement: "W",
-    device_class: "power",
-    state_class: "measurement",
-    value_template: "{{ value_json.control_value }}",
-    suggested_display_precision: 0,
-    device: DEVICE,
+const MULTIPLUS_CONTROL_CONFIG: &SensorConfig = &SensorConfig {
+    topic: "homeassistant/sensor/simsys/control_multiplus/config",
+    payload: &Sensor {
+        name: "Multiplus Control",
+        platform: "sensor",
+        unique_id: "multiplus-control",
+        enabled_by_default: true,
+        state_topic: "simsys/control/multiplus/state",
+        availability_topic: "simsys/e_meter/multiplus/avail",
+        unit_of_measurement: "W",
+        device_class: "power",
+        state_class: "measurement",
+        value_template: "{{ value_json.control_value }}",
+        suggested_display_precision: 0,
+        device: DEVICE,
+    }
 };
-const MULTIPLUS_CONTROL_CONFIG_TOPIC: &str = "homeassistant/sensor/simsys/control_multiplus/config";
 
 const MULTIPLUS_CONN_CONFIC: &BinarySensor = &BinarySensor {
     name: "Multiplus Connection",
