@@ -17,11 +17,10 @@ impl TasmotaMeter {
     /// Create a new meter
     pub fn new(
         influxdb: &InfluxDb,
-        conn_topic: &'static str,
-        conn_config: &'static BinarySensor,
+        conn_config: &'static BinarySensorConfig,
         e_meter_config: &'static ConstEMeter,
     ) -> Self {
-        let connection = Connection::new(conn_topic, conn_config);
+        let connection = Connection::new(conn_config);
         let e_meter = EMeter::new(influxdb, e_meter_config);
         TasmotaMeter {
             connection,
@@ -196,20 +195,21 @@ const Z1_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
     },
 };
 
-const Z1_CONN_CONFIC: &BinarySensor = &BinarySensor {
-    name: "Z1 Connection",
-    platform: "binary_sensor",
-    unique_id: "connection-z1",
-    state_topic: "simsys/connections/z1/state",
-    device_class: "connectivity",
-    device: DEVICE,
+const Z1_CONN_CONFIC: &BinarySensorConfig = &BinarySensorConfig {
+    topic: "homeassistant/binary_sensor/simsys/connection_z1/config",
+    payload: &BinarySensor {
+        name: "Z1 Connection",
+        platform: "binary_sensor",
+        unique_id: "connection-z1",
+        state_topic: "simsys/connections/z1/state",
+        device_class: "connectivity",
+        device: DEVICE,
+    }
 };
-const Z1_CONN_CONFIG_TOPIC: &str = "homeassistant/binary_sensor/simsys/connection_z1/config";
 
 pub fn z1_emeter(influxdb: &InfluxDb) -> TasmotaMeter {
     TasmotaMeter::new(
         influxdb,
-        Z1_CONN_CONFIG_TOPIC,
         Z1_CONN_CONFIC,
         Z1_EMETER_CONFIG,
     )
@@ -286,20 +286,21 @@ const Z2_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
     },
 };
 
-const Z2_CONN_CONFIC: &BinarySensor = &BinarySensor {
-    name: "Z2 Connection",
-    platform: "binary_sensor",
-    unique_id: "connection-z2",
-    state_topic: "simsys/connections/z2/state",
-    device_class: "connectivity",
-    device: DEVICE,
+const Z2_CONN_CONFIC: &BinarySensorConfig = &BinarySensorConfig {
+    topic: "homeassistant/binary_sensor/simsys/connection_z2/config",
+    payload: &BinarySensor {
+        name: "Z2 Connection",
+        platform: "binary_sensor",
+        unique_id: "connection-z2",
+        state_topic: "simsys/connections/z2/state",
+        device_class: "connectivity",
+        device: DEVICE,
+    }
 };
-const Z2_CONN_CONFIG_TOPIC: &str = "homeassistant/binary_sensor/simsys/connection_z2/config";
 
 pub fn z2_emeter(influxdb: &InfluxDb) -> TasmotaMeter {
     TasmotaMeter::new(
         influxdb,
-        Z2_CONN_CONFIG_TOPIC,
         Z2_CONN_CONFIC,
         Z2_EMETER_CONFIG,
     )
@@ -376,20 +377,21 @@ const Z3_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
     },
 };
 
-const Z3_CONN_CONFIC: &BinarySensor = &BinarySensor {
-    name: "Z3 Connection",
-    platform: "binary_sensor",
-    unique_id: "connection-z3",
-    state_topic: "simsys/connections/z3/state",
-    device_class: "connectivity",
-    device: DEVICE,
+const Z3_CONN_CONFIC: &BinarySensorConfig = &BinarySensorConfig {
+    topic: "homeassistant/binary_sensor/simsys/connection_z3/config",
+    payload: &BinarySensor {
+        name: "Z3 Connection",
+        platform: "binary_sensor",
+        unique_id: "connection-z3",
+        state_topic: "simsys/connections/z3/state",
+        device_class: "connectivity",
+        device: DEVICE,
+    }
 };
-const Z3_CONN_CONFIG_TOPIC: &str = "homeassistant/binary_sensor/simsys/connection_z3/config";
 
 pub fn z3_emeter(influxdb: &InfluxDb) -> TasmotaMeter {
     TasmotaMeter::new(
         influxdb,
-        Z3_CONN_CONFIG_TOPIC,
         Z3_CONN_CONFIC,
         Z3_EMETER_CONFIG,
     )

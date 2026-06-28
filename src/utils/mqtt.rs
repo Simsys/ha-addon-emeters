@@ -179,6 +179,12 @@ pub struct Switch {
 }
 
 #[derive(Debug, Serialize)]
+pub struct SwitchConfig {
+    pub topic: &'static str,
+    pub payload: &'static Switch,
+}
+
+#[derive(Debug, Serialize)]
 pub struct Sensor {
     pub name: &'static str,
     pub platform: &'static str,
@@ -209,3 +215,10 @@ pub struct BinarySensor {
     pub device_class: &'static str,
     pub device: &'static Device,
 }
+
+#[derive(Debug, Serialize)]
+pub struct BinarySensorConfig {
+    pub topic: &'static str,
+    pub payload: &'static BinarySensor,
+}
+

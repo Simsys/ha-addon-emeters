@@ -1,21 +1,19 @@
 /// Connection to a server: create MQTT discovery message and state messages
 use crate::{
-    utils::{BinarySensor, MqttMessage, MqttMessages},
+    utils::{BinarySensorConfig, MqttMessage, MqttMessages},
 };
 use log::*;
 
 /// The connection struct chechs and signals connection to a remote server
 pub struct Connection {
-    config_topic: &'static str,
-    config: &'static BinarySensor,
+    config: &'static BinarySensorConfig,
     state_sent: Option<bool>,
 }
 
 impl Connection {
     /// Create a connection struct
-    pub fn new(config_topic: &'static str, config: &'static BinarySensor) -> Self {
+    pub fn new(config: &'static BinarySensorConfig) -> Self {
         Connection {
-            config_topic,
             config,
             state_sent: None,
         }
@@ -24,7 +22,7 @@ impl Connection {
     /// Create discovery message
     pub fn power_up_msgs(&self) -> MqttMessages {
         let payload = serde_json::to_string(self.config).unwrap();
-        let msg = MqttMessage::new(self.config_topic, payload)
+        let msg = MqttMessage::new(self.config.topic, payload)
             .set_qos(rumqttc::QoS::AtLeastOnce)
             .set_retain(true);
         MqttMessages::from_msg(msg)
@@ -61,7 +59,7 @@ impl Connection {
     }
 
     fn create_message(&self) -> MqttMessages {
-        let topic = self.config.state_topic;
+        let topic = self.config.payload.state_topic;
         let (payload, msg) = if self.state() {
             ("ON", "Device connected")
         } else {

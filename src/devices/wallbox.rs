@@ -135,7 +135,7 @@ pub struct Wallbox {
 impl Wallbox {
     /// Create a new meter
     pub fn new(influxdb: &InfluxDb) -> Self {
-        let connection = Connection::new(WALLBOX_CONN_CONFIG_TOPIC, WALLBOX_CONN_CONFIC);
+        let connection = Connection::new(WALLBOX_CONN_CONFIC);
         let e_meter = EMeter::new(influxdb, WALLBOX_EMETER_CONFIG);
         let control = Control::new(
             influxdb,
@@ -209,7 +209,7 @@ impl Wallbox {
             _ => self.no_solar = false,
         }
         let msg = MqttMessage::new(
-            WALLBOX_NO_SOLAR_CONFIG.state_topic, 
+            WALLBOX_NO_SOLAR_CONFIG.topic, 
             str::from_utf8(payload).unwrap()
         );
         msgs += msg;
@@ -340,15 +340,17 @@ const WALLBOX_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
     },
 };
 
-const WALLBOX_CONN_CONFIC: &BinarySensor = &BinarySensor {
-    name: "Wallbox Connection",
-    platform: "binary_sensor",
-    unique_id: "connection-wallbox",
-    state_topic: "simsys/connections/wallbox/state",
-    device_class: "connectivity",
-    device: DEVICE,
+const WALLBOX_CONN_CONFIC: &BinarySensorConfig = &BinarySensorConfig {
+    topic: "homeassistant/binary_sensor/simsys/connection_wallbox/config",
+    payload: &BinarySensor {
+        name: "Wallbox Connection",
+        platform: "binary_sensor",
+        unique_id: "connection-wallbox",
+        state_topic: "simsys/connections/wallbox/state",
+        device_class: "connectivity",
+        device: DEVICE,
+    }
 };
-const WALLBOX_CONN_CONFIG_TOPIC: &str = "homeassistant/binary_sensor/simsys/connection_wallbox/config";
 
 const WALLBOX_CONTROL_CONFIG: &SensorConfig = &SensorConfig {
     topic: "homeassistant/sensor/simsys/control_wallbox/config",
@@ -368,15 +370,18 @@ const WALLBOX_CONTROL_CONFIG: &SensorConfig = &SensorConfig {
     }
 };
 
-const WALLBOX_NO_SOLAR_CONFIG: &Switch = &Switch {
-    name: "Wallbox No Solar (always)",
-    platform: "switch",
-    unique_id: "wallbox-no-solar",
-    command_topic: "simsys/e_meter/wallbox/no_solar_cmd",
-    state_topic: "simsys/e_meter/wallbox/no_solar_state",
-    payload_off: "off",
-    payload_on: "on",
-    device: DEVICE,
+const WALLBOX_NO_SOLAR_CONFIG: &SwitchConfig = &SwitchConfig {
+    topic: "homeassistant/switch/simsys/no_solar_wallbox/config",
+    payload: &Switch {
+        name: "Wallbox No Solar (always)",
+        platform: "switch",
+        unique_id: "wallbox-no-solar",
+        command_topic: "simsys/e_meter/wallbox/no_solar_cmd",
+        state_topic: "simsys/e_meter/wallbox/no_solar_state",
+        payload_off: "off",
+        payload_on: "on",
+        device: DEVICE,
+    }
 };
 const WALLBOX_NO_SOLAR_CONFIG_TOPIC: &str = "homeassistant/switch/simsys/no_solar_wallbox/config";
 

@@ -102,7 +102,7 @@ pub struct Multiplus {
 #[allow(unused)]
 impl Multiplus {
     pub fn new(influxdb: &InfluxDb) -> Self {
-        let connection = Connection::new(MULTIPLUS_CONN_CONFIG_TOPIC, MULTIPLUS_CONN_CONFIC);
+        let connection = Connection::new(MULTIPLUS_CONN_CONFIC);
         let e_meter = EMeter::new(
             influxdb,
             MULTIPLUS_EMETER_CONFIG,
@@ -418,15 +418,17 @@ const MULTIPLUS_CONTROL_CONFIG: &SensorConfig = &SensorConfig {
     }
 };
 
-const MULTIPLUS_CONN_CONFIC: &BinarySensor = &BinarySensor {
-    name: "Multiplus Connection",
-    platform: "binary_sensor",
-    unique_id: "connection-multiplus",
-    state_topic: "simsys/connections/multiplus/state",
-    device_class: "connectivity",
-    device: DEVICE,
+const MULTIPLUS_CONN_CONFIC: &BinarySensorConfig = &BinarySensorConfig {
+    topic: "homeassistant/binary_sensor/simsys/connection_multiplus/config",
+    payload: &BinarySensor {
+        name: "Multiplus Connection",
+        platform: "binary_sensor",
+        unique_id: "connection-multiplus",
+        state_topic: "simsys/connections/multiplus/state",
+        device_class: "connectivity",
+        device: DEVICE,
+    }
 };
-const MULTIPLUS_CONN_CONFIG_TOPIC: &str = "homeassistant/binary_sensor/simsys/connection_multiplus/config";
 
 pub fn multiplus(influxdb: &InfluxDb) -> Multiplus {
     Multiplus::new(influxdb)
