@@ -27,7 +27,7 @@ impl Control {
     }
 
     pub async fn power_up_msgs(&mut self) -> MqttMessages {
-        let payload = serde_json::to_string(self.config).unwrap();
+        let payload = serde_json::to_string(self.config.payload).unwrap();
         let msg = MqttMessage::new(self.config.topic, payload)
             .set_qos(rumqttc::QoS::AtLeastOnce)
             .set_retain(true);

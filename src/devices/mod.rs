@@ -100,7 +100,7 @@ impl Devices {
             "go-eCharger/083205/eto",
             "go-eCharger/083205/nrg",
             "tasmota/electricity-meter/+/SENSOR",
-            "simsys/e_meter/wallbox/no_solar_cmd",
+            "simsys/switch/wallbox/no_solar_cmd",
         ]
     }
 
@@ -203,7 +203,7 @@ impl Devices {
             "go-eCharger/083205/eto" => self.wallbox.value_from_eto(payload).await,
             "go-eCharger/083205/nrg" => self.wallbox.value_from_nrg(payload).await,
             "go-eCharger/083205/car" => self.wallbox.value_from_car(payload).await,
-            "simsys/e_meter/wallbox/no_solar_cmd" => self.wallbox.no_solar_switch(payload).await,
+            "simsys/switch/wallbox/no_solar_cmd" => self.wallbox.no_solar_switch(payload).await,
 
             _ => MqttMessages::new(),
         }

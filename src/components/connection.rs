@@ -21,7 +21,7 @@ impl Connection {
 
     /// Create discovery message
     pub fn power_up_msgs(&self) -> MqttMessages {
-        let payload = serde_json::to_string(self.config).unwrap();
+        let payload = serde_json::to_string(self.config.payload).unwrap();
         let msg = MqttMessage::new(self.config.topic, payload)
             .set_qos(rumqttc::QoS::AtLeastOnce)
             .set_retain(true);

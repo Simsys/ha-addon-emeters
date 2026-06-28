@@ -130,9 +130,15 @@ impl Multiplus {
 
     pub async fn power_up_msgs(&mut self) -> MqttMessages {
         let mut msgs = self.connection.power_up_msgs();
+
         msgs += self.e_meter.power_up_msgs().await;
         msgs += self.battery.power_up_msgs().await;
         msgs += self.control.power_up_msgs().await;
+
+        if let Ok(soc) = self.state_of_charge().await {
+            msgs += self.battery.set_state_of_charge(soc).await
+        }
+
         msgs
     }
 

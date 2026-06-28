@@ -115,7 +115,7 @@ impl MqttClient {
             .set_clean_session(false); // Broker merkt sich Subscriptions (optional)
 
         // Der Client sendet Befehle, die Eventloop verarbeitet die Netzwerk-Pakete
-        let (client, eventloop) = AsyncClient::new(mqttoptions, 100);
+        let (client, eventloop) = AsyncClient::new(mqttoptions, 200);
         MqttClient { client, eventloop }
     }
 

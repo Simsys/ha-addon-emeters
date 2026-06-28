@@ -156,8 +156,8 @@ impl Wallbox {
 
     pub async fn power_up_msgs(&mut self) -> MqttMessages {
         let no_solar_power_up_msg = MqttMessage::new(
-            WALLBOX_NO_SOLAR_CONFIG_TOPIC,
-            serde_json::to_string(WALLBOX_NO_SOLAR_CONFIG).unwrap(),
+            WALLBOX_NO_SOLAR_CONFIG.topic,
+            serde_json::to_string(WALLBOX_NO_SOLAR_CONFIG.payload).unwrap(),
         )
         .set_qos(rumqttc::QoS::AtLeastOnce)
         .set_retain(true);
@@ -209,7 +209,7 @@ impl Wallbox {
             _ => self.no_solar = false,
         }
         let msg = MqttMessage::new(
-            WALLBOX_NO_SOLAR_CONFIG.topic, 
+            WALLBOX_NO_SOLAR_CONFIG.payload.state_topic, 
             str::from_utf8(payload).unwrap()
         );
         msgs += msg;
@@ -376,14 +376,13 @@ const WALLBOX_NO_SOLAR_CONFIG: &SwitchConfig = &SwitchConfig {
         name: "Wallbox No Solar (always)",
         platform: "switch",
         unique_id: "wallbox-no-solar",
-        command_topic: "simsys/e_meter/wallbox/no_solar_cmd",
-        state_topic: "simsys/e_meter/wallbox/no_solar_state",
+        command_topic: "simsys/switch/wallbox/no_solar_cmd",
+        state_topic: "simsys/switch/wallbox/no_solar_state",
         payload_off: "off",
         payload_on: "on",
         device: DEVICE,
     }
 };
-const WALLBOX_NO_SOLAR_CONFIG_TOPIC: &str = "homeassistant/switch/simsys/no_solar_wallbox/config";
 
 pub fn wallbox_meter(influxdb: &InfluxDb) -> Wallbox {
     Wallbox::new(influxdb)
