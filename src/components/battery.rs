@@ -9,6 +9,7 @@ const MAX_TICK: u32 = 60;
 pub struct Battery {
     soc: f64,
     tick: u32,
+    was_full: bool,
 
     influxdb: InfluxDb,
     config: &'static SensorConfig,
@@ -22,6 +23,7 @@ impl Battery {
         Battery {
             soc: 0.0,
             tick: 0,
+            was_full: false,
             influxdb: influxdb.clone(),
             config,
         }
@@ -69,17 +71,23 @@ impl Battery {
     }
 
     #[allow(unused)]
-    pub fn is_full(&self) -> bool {
+    pub fn is_full(&mut self) -> bool {
         let now = chrono::Local::now();
         let weekday = now.weekday();
-        match now.month() {
+        let mut soc = self.soc;
+        if self.was_full {
+            soc += 0.5;
+        }
+        let is_full = match now.month() {
             // in june and july, bat will only charged to 100% on mondays
             6|7 => match now.weekday() {
-                chrono::Weekday::Mon => self.soc > 99.5,
-                _ => self.soc > 84.5
+                chrono::Weekday::Mon => soc > 99.5,
+                _ => soc > 85.0
             }
-            _ => self.soc > 99.5
-        }
+            _ => soc > 99.5
+        };
+        self.was_full = is_full;
+        is_full
     }
 
     #[allow(unused)]
