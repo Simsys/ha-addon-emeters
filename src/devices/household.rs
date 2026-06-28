@@ -1,6 +1,5 @@
 /// Simple Model of a electricity meter of the household consumption
 use crate::components::*;
-use crate::devices::*;
 use crate::utils::*;
 
 pub struct Household {
@@ -13,7 +12,6 @@ impl Household {
     pub fn new(influxdb: &InfluxDb) -> Self {
         let e_meter = EMeter::new(
             influxdb,
-            HOUSEHOLD_EMETER_CONFIG_TOPIC,
             HOUSEHOLD_EMETER_CONFIG,
         );
         Household {
@@ -56,10 +54,9 @@ impl Household {
 }
 
 const HOUSEHOLD_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
-    device: DEVICE,
-    origin: ORIGIN,
-    components: &EMeterComponents {
-        e_in: &Sensor2 {
+    e_in: &TopicAndSensor {
+        topic: "homeassistant/sensor/simsys/e_meter_e_in_household/config",
+        sensor: &Sensor {
             name: "Household Energy",
             platform: "sensor",
             unique_id: "household-energy-in",
@@ -71,8 +68,12 @@ const HOUSEHOLD_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
             state_class: "total_increasing",
             value_template: "{{ value_json.e_in }}",
             suggested_display_precision: 0,
+            device: DEVICE,
         },
-        e_out: &Sensor2 {
+    },
+    e_out: &TopicAndSensor {
+        topic: "homeassistant/sensor/simsys/e_meter_e_out_household/config",
+        sensor: &Sensor {
             name: "Household Energy Output",
             platform: "sensor",
             unique_id: "household-energy-out",
@@ -84,8 +85,12 @@ const HOUSEHOLD_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
             state_class: "total_increasing",
             value_template: "{{ value_json.e_out }}",
             suggested_display_precision: 0,
+            device: DEVICE,
         },
-        power: &Sensor2 {
+    },
+    power: &TopicAndSensor {
+        topic: "homeassistant/sensor/simsys/e_meter_power_household/config",
+        sensor: &Sensor {
             name: "Household Power",
             platform: "sensor",
             unique_id: "household-power",
@@ -97,8 +102,12 @@ const HOUSEHOLD_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
             state_class: "measurement",
             value_template: "{{ value_json.power }}",
             suggested_display_precision: 0,
+            device: DEVICE,
         },
-        sec_power: &Sensor2 {
+    },
+    sec_power: &TopicAndSensor {
+        topic: "homeassistant/sensor/simsys/e_meter_sec_power_household/config",
+        sensor: &Sensor {
             name: "Household Sec Power",
             platform: "sensor",
             unique_id: "household-sec-power",
@@ -110,10 +119,10 @@ const HOUSEHOLD_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
             state_class: "measurement",
             value_template: "{{ value_json.sec_power }}",
             suggested_display_precision: 0,
+            device: DEVICE,
         },
     },
 };
-const HOUSEHOLD_EMETER_CONFIG_TOPIC: &str = "homeassistant/device/simsys/e_meter_household/config";
 
 pub fn household(influxdb: &InfluxDb) -> Household {
     Household::new(influxdb)

@@ -1,6 +1,5 @@
 /// Simple Model of a electricity meter of a heatpump
 use crate::components::*;
-use crate::devices::*;
 use crate::utils::*;
 
 pub struct Heatpump {
@@ -13,7 +12,6 @@ impl Heatpump {
     pub fn new(influxdb: &InfluxDb) -> Self {
         let e_meter = EMeter::new(
             influxdb,
-            HEATPUMP_EMETER_CONFIG_TOPIC,
             HEATPUMP_EMETER_CONFIG,
         );
         Heatpump {
@@ -56,10 +54,9 @@ impl Heatpump {
 }
 
 const HEATPUMP_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
-    device: DEVICE,
-    origin: ORIGIN,
-    components: &EMeterComponents {
-        e_in: &Sensor2 {
+    e_in: &TopicAndSensor { 
+        topic: "homeassistant/sensor/simsys/e_meter_e_in_heatpump/config", 
+        sensor: &Sensor {
             name: "Heatpump Energy",
             platform: "sensor",
             unique_id: "heatpump-energy-in",
@@ -71,8 +68,12 @@ const HEATPUMP_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
             state_class: "total_increasing",
             value_template: "{{ value_json.e_in }}",
             suggested_display_precision: 0,
+            device: DEVICE,
         },
-        e_out: &Sensor2 {
+    },
+    e_out: &TopicAndSensor { 
+        topic: "homeassistant/sensor/simsys/e_meter_e_out_heatpump/config", 
+        sensor: &Sensor {
             name: "Heatpump Energy Output",
             platform: "sensor",
             unique_id: "heatpump-energy-out",
@@ -84,8 +85,12 @@ const HEATPUMP_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
             state_class: "total_increasing",
             value_template: "{{ value_json.e_out }}",
             suggested_display_precision: 0,
+            device: DEVICE,
         },
-        power: &Sensor2 {
+    },
+    power: &TopicAndSensor { 
+        topic: "homeassistant/sensor/simsys/e_meter_power_heatpump/config", 
+        sensor: &Sensor {
             name: "Heatpump Power",
             platform: "sensor",
             unique_id: "heatpump-power",
@@ -97,8 +102,12 @@ const HEATPUMP_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
             state_class: "measurement",
             value_template: "{{ value_json.power }}",
             suggested_display_precision: 0,
+            device: DEVICE,
         },
-        sec_power: &Sensor2 {
+    },
+    sec_power: &TopicAndSensor { 
+        topic: "homeassistant/sensor/simsys/e_meter_sec_power_heatpump/config", 
+        sensor: &Sensor {
             name: "Heatpump Sec Power",
             platform: "sensor",
             unique_id: "heatpump-sec-power",
@@ -110,10 +119,10 @@ const HEATPUMP_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
             state_class: "measurement",
             value_template: "{{ value_json.sec_power }}",
             suggested_display_precision: 0,
+            device: DEVICE,
         },
     },
 };
-const HEATPUMP_EMETER_CONFIG_TOPIC: &str = "homeassistant/device/simsys/e_meter_heatpump/config";
 
 pub fn heatpump(influxdb: &InfluxDb) -> Heatpump {
     Heatpump::new(influxdb)

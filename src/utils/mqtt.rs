@@ -195,6 +195,12 @@ pub struct Sensor {
 }
 
 #[derive(Debug, Serialize)]
+pub struct TopicAndSensor {
+    pub topic: &'static str,
+    pub sensor: &'static Sensor,
+}
+
+#[derive(Debug, Serialize)]
 pub struct BinarySensor {
     pub name: &'static str,
     pub platform: &'static str,

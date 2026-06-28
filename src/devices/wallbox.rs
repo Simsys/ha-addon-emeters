@@ -136,7 +136,7 @@ impl Wallbox {
     /// Create a new meter
     pub fn new(influxdb: &InfluxDb) -> Self {
         let connection = Connection::new(WALLBOX_CONN_CONFIG_TOPIC, WALLBOX_CONN_CONFIC);
-        let e_meter = EMeter::new(influxdb, WALLBOX_EMETER_CONFIG_TOPIC, WALLBOX_EMETER_CONFIG);
+        let e_meter = EMeter::new(influxdb, WALLBOX_EMETER_CONFIG);
         let control = Control::new(
             influxdb,
             WALLBOX_CONTROL_CONFIG_TOPIC,
@@ -271,10 +271,9 @@ impl Wallbox {
 }
 
 const WALLBOX_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
-    device: DEVICE,
-    origin: ORIGIN,
-    components: &EMeterComponents {
-        e_in: &Sensor2 {
+    e_in: &TopicAndSensor {
+        topic: "homeassistant/sensor/simsys/e_meter_e_in_wallbox/config",
+        sensor: &Sensor {
             name: "Wallbox Energy",
             platform: "sensor",
             unique_id: "wallbox-energy-in",
@@ -286,8 +285,12 @@ const WALLBOX_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
             state_class: "total_increasing",
             value_template: "{{ value_json.e_in }}",
             suggested_display_precision: 0,
+            device: DEVICE,
         },
-        e_out: &Sensor2 {
+    },
+    e_out: &TopicAndSensor {
+        topic: "homeassistant/sensor/simsys/e_meter_e_out_wallbox/config",
+        sensor: &Sensor {
             name: "Wallbox Energy Output",
             platform: "sensor",
             unique_id: "wallbox-energy-out",
@@ -299,8 +302,12 @@ const WALLBOX_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
             state_class: "total_increasing",
             value_template: "{{ value_json.e_out }}",
             suggested_display_precision: 0,
+            device: DEVICE,
         },
-        power: &Sensor2 {
+    },
+    power: &TopicAndSensor {
+        topic: "homeassistant/sensor/simsys/e_meter_power_wallbox/config",
+        sensor: &Sensor {
             name: "Wallbox Power",
             platform: "sensor",
             unique_id: "wallbox-power",
@@ -312,8 +319,12 @@ const WALLBOX_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
             state_class: "measurement",
             value_template: "{{ value_json.power }}",
             suggested_display_precision: 0,
+            device: DEVICE,
         },
-        sec_power: &Sensor2 {
+    },
+    sec_power: &TopicAndSensor {
+        topic: "homeassistant/sensor/simsys/e_meter_sec_power_wallbox/config",
+        sensor: &Sensor {
             name: "Wallbox Sec Power",
             platform: "sensor",
             unique_id: "wallbox-sec-power",
@@ -325,10 +336,10 @@ const WALLBOX_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
             state_class: "measurement",
             value_template: "{{ value_json.sec_power }}",
             suggested_display_precision: 0,
+            device: DEVICE,
         },
     },
 };
-const WALLBOX_EMETER_CONFIG_TOPIC: &str = "homeassistant/device/simsys/e_meter_wallbox/config";
 
 const WALLBOX_CONN_CONFIC: &BinarySensor = &BinarySensor {
     name: "Wallbox Connection",

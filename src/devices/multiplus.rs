@@ -1,6 +1,5 @@
 /// Model of a Victron Multiplus 2 device, connected via Modbus TCP
 use crate::components::*;
-use crate::devices::*;
 use crate::utils::*;
 
 use std::fmt::{Display, Formatter};
@@ -106,7 +105,6 @@ impl Multiplus {
         let connection = Connection::new(MULTIPLUS_CONN_CONFIG_TOPIC, MULTIPLUS_CONN_CONFIC);
         let e_meter = EMeter::new(
             influxdb,
-            MULTIPLUS_EMETER_CONFIG_TOPIC,
             MULTIPLUS_EMETER_CONFIG,
         );
         let battery = Battery::new(
@@ -316,10 +314,9 @@ impl Multiplus {
 }
 
 const MULTIPLUS_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
-    device: DEVICE,
-    origin: ORIGIN,
-    components: &EMeterComponents {
-        e_in: &Sensor2 {
+    e_in: &TopicAndSensor {
+        topic: "homeassistant/sensor/simsys/e_meter_e_in_multiplus/config",
+        sensor: &Sensor {
             name: "Multiplus Energy Charge",
             platform: "sensor",
             unique_id: "multiplus-energy-in",
@@ -331,8 +328,12 @@ const MULTIPLUS_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
             state_class: "total_increasing",
             value_template: "{{ value_json.e_in }}",
             suggested_display_precision: 0,
+            device: DEVICE,
         },
-        e_out: &Sensor2 {
+    },
+    e_out: &TopicAndSensor {
+        topic: "homeassistant/sensor/simsys/e_meter_e_out_multiplus/config",
+        sensor: &Sensor {
             name: "Multiplus Energy Discharge",
             platform: "sensor",
             unique_id: "multiplus-energy-out",
@@ -344,8 +345,12 @@ const MULTIPLUS_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
             state_class: "total_increasing",
             value_template: "{{ value_json.e_out }}",
             suggested_display_precision: 0,
+            device: DEVICE,
         },
-        power: &Sensor2 {
+    },
+    power: &TopicAndSensor {
+        topic: "homeassistant/sensor/simsys/e_meter_power_multiplus/config",
+        sensor: &Sensor {
             name: "Multiplus Power",
             platform: "sensor",
             unique_id: "multiplus-power",
@@ -357,8 +362,12 @@ const MULTIPLUS_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
             state_class: "measurement",
             value_template: "{{ value_json.power }}",
             suggested_display_precision: 0,
+            device: DEVICE,
         },
-        sec_power: &Sensor2 {
+    },
+    sec_power: &TopicAndSensor {
+        topic: "homeassistant/sensor/simsys/e_meter_sec_power_multiplus/config",
+        sensor: &Sensor {
             name: "Multiplus Sec Power",
             platform: "sensor",
             unique_id: "multiplus-sec-power",
@@ -370,10 +379,10 @@ const MULTIPLUS_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
             state_class: "measurement",
             value_template: "{{ value_json.sec_power }}",
             suggested_display_precision: 0,
+            device: DEVICE,
         },
     },
 };
-const MULTIPLUS_EMETER_CONFIG_TOPIC: &str = "homeassistant/device/simsys/e_meter_multiplus/config";
 
 const MULTIPLUS_BATTERY_CONFIG: &Sensor = &Sensor {
     name: "Multiplus State of Charge",

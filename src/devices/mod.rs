@@ -1,7 +1,5 @@
 use log::*;
 /// Define all devices / electricity meters
-use serde::Serialize;
-
 mod heatpump;
 pub use heatpump::{heatpump, Heatpump};
 
@@ -211,31 +209,3 @@ impl Devices {
         }
     }
 }
-
-/*
-/// Fixed details for the discovery messages
-#[allow(unused)]
-#[derive(Debug, Serialize)]
-pub struct Device {
-    identifiers: [&'static str; 1],
-    name: &'static str,
-    manufacturer: &'static str,
-}
-
-/// Fixed details for the discovery messages
-#[allow(unused)]
-pub const DEVICE: &Device = &Device {
-    identifiers: ["ElectricitySensor"],
-    name: "Electricity Sensors",
-    manufacturer: "SimSys",
-};
-*/
-
-/// Fixed details for the discovery messages
-#[derive(Debug, Serialize)]
-pub struct Origin {
-    name: &'static str,
-}
-
-/// Fixed details for the discovery messages
-pub const ORIGIN: &Origin = &Origin { name: "simsys" };

@@ -4,7 +4,6 @@
 use super::{InfluxDb, PhysicalQuantity};
 
 use crate::{
-    devices::Origin,
     utils::*,
     utils::{MqttMessage, MqttMessages},
 };
@@ -45,19 +44,11 @@ pub enum EValue {
 
 /// Details for the discovery message
 #[derive(Debug, Serialize)]
-pub struct EMeterComponents {
-    pub e_in: &'static Sensor2,
-    pub e_out: &'static Sensor2,
-    pub power: &'static Sensor2,
-    pub sec_power: &'static Sensor2,
-}
-
-/// Discovery Message
-#[derive(Debug, Serialize)]
 pub struct ConstEMeter {
-    pub device: &'static Device,
-    pub origin: &'static Origin,
-    pub components: &'static EMeterComponents,
+    pub e_in: &'static TopicAndSensor,
+    pub e_out: &'static TopicAndSensor,
+    pub power: &'static TopicAndSensor,
+    pub sec_power: &'static TopicAndSensor,
 }
 
 /// The electricity meter structure
@@ -73,7 +64,6 @@ pub struct EMeter {
     tick_count: i32,
 
     influxdb: InfluxDb,
-    config_topic: &'static str,
     config: &'static ConstEMeter,
 }
 
@@ -81,7 +71,6 @@ impl EMeter {
     /// Create a EMeter struct
     pub fn new(
         influxdb: &InfluxDb,
-        config_topic: &'static str,
         config: &'static ConstEMeter,
     ) -> Self {
         EMeter {
@@ -96,31 +85,46 @@ impl EMeter {
             tick_count: 0,
 
             influxdb: influxdb.clone(),
-            config_topic,
             config,
         }
     }
 
     /// Create the discovery messages for the electricity meter
     pub async fn power_up_msgs(&mut self) -> MqttMessages {
-        let payload = serde_json::to_string(self.config).unwrap();
-        let msg = MqttMessage::new(self.config_topic, payload)
+        let mut msgs = MqttMessages::new();
+
+        let payload = serde_json::to_string(self.config.e_in.sensor).unwrap();
+        msgs += MqttMessage::new(self.config.e_in.topic, payload)
             .set_qos(rumqttc::QoS::AtLeastOnce)
             .set_retain(true);
-        let mut msgs = MqttMessages::from_msg(msg);
+
+        let payload = serde_json::to_string(self.config.e_out.sensor).unwrap();
+        msgs += MqttMessage::new(self.config.e_out.topic, payload)
+            .set_qos(rumqttc::QoS::AtLeastOnce)
+            .set_retain(true);
+
+        let payload = serde_json::to_string(self.config.power.sensor).unwrap();
+        msgs += MqttMessage::new(self.config.power.topic, payload)
+            .set_qos(rumqttc::QoS::AtLeastOnce)
+            .set_retain(true);
+
+        let payload = serde_json::to_string(self.config.sec_power.sensor).unwrap();
+        msgs += MqttMessage::new(self.config.sec_power.topic, payload)
+            .set_qos(rumqttc::QoS::AtLeastOnce)
+            .set_retain(true);
 
         let mut task = EmeterTask::default();
         if let Ok(energy) = self
             .influxdb
             .get_value(
-                self.config.components.e_in.unique_id,
+                self.config.e_in.sensor.unique_id,
                 PhysicalQuantity::Energy,
             )
             .await
         {
             trace!(
                 "Read from InfluxDb {}: {:.0} {}",
-                self.config.components.e_in.unique_id,
+                self.config.e_in.sensor.unique_id,
                 energy,
                 PhysicalQuantity::Energy.unit()
             );
@@ -132,14 +136,14 @@ impl EMeter {
         if let Ok(energy) = self
             .influxdb
             .get_value(
-                self.config.components.e_out.unique_id,
+                self.config.e_out.sensor.unique_id,
                 PhysicalQuantity::Energy,
             )
             .await
         {
             trace!(
                 "Read from InfluxDb {}: {:.0} {}",
-                self.config.components.e_out.unique_id,
+                self.config.e_out.sensor.unique_id,
                 energy,
                 PhysicalQuantity::Energy.unit()
             );
@@ -151,14 +155,14 @@ impl EMeter {
         if let Ok(power) = self
             .influxdb
             .get_value(
-                self.config.components.power.unique_id,
+                self.config.power.sensor.unique_id,
                 PhysicalQuantity::Power,
             )
             .await
         {
             trace!(
                 "Read from InfluxDb {}: {:.0} {}",
-                self.config.components.power.unique_id,
+                self.config.power.sensor.unique_id,
                 power,
                 PhysicalQuantity::Power.unit()
             );
@@ -223,7 +227,7 @@ impl EMeter {
         if self.avail != avail {
             // set availability topic to online/offline
             let payload = if avail { "online" } else { "offline" };
-            msgs += MqttMessage::new(self.config.components.e_in.availability_topic, payload)
+            msgs += MqttMessage::new(self.config.e_in.sensor.availability_topic, payload)
                 .set_retain(true);
 
             // if avail == true send all possible sensor values
@@ -326,7 +330,7 @@ impl EMeter {
     async fn create_message(&mut self, task: EmeterTask, write_to_db: bool) -> MqttMessage {
         if task.e_in {
             if write_to_db {
-                let sensor_id = self.config.components.e_in.unique_id;
+                let sensor_id = self.config.e_in.sensor.unique_id;
                 let quantity = PhysicalQuantity::Energy;
                 let value = self.e_in;
                 let _ = self.influxdb.set_value(sensor_id, quantity, value).await;
@@ -340,7 +344,7 @@ impl EMeter {
         }
         if task.e_out {
             if write_to_db {
-                let sensor_id = self.config.components.e_out.unique_id;
+                let sensor_id = self.config.e_out.sensor.unique_id;
                 let quantity = PhysicalQuantity::Energy;
                 let value = self.e_out;
                 let _ = self.influxdb.set_value(sensor_id, quantity, value).await;
@@ -354,7 +358,7 @@ impl EMeter {
         }
         if task.power {
             if write_to_db {
-                let sensor_id = self.config.components.power.unique_id;
+                let sensor_id = self.config.power.sensor.unique_id;
                 let quantity = PhysicalQuantity::Power;
                 let value = self.power;
                 let _ = self.influxdb.set_value(sensor_id, quantity, value).await;
@@ -370,7 +374,7 @@ impl EMeter {
             r#"{{"e_in": {:.3}, "e_out": {:.3}, "sec_power": {:.3}, "power": {:.3}}}"#,
             self.e_in, self.e_out, self.sec_power, self.power,
         );
-        MqttMessage::new(self.config.components.e_in.state_topic, msg)
+        MqttMessage::new(self.config.e_in.sensor.state_topic, msg)
     }
 }
 

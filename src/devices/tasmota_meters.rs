@@ -1,5 +1,4 @@
 use crate::components::*;
-use crate::devices::*;
 use crate::utils::*;
 use crate::utils::{MqttMessages, TIMEOUT};
 use serde::Deserialize;
@@ -20,11 +19,10 @@ impl TasmotaMeter {
         influxdb: &InfluxDb,
         conn_topic: &'static str,
         conn_config: &'static BinarySensor,
-        e_meter_topic: &'static str,
         e_meter_config: &'static ConstEMeter,
     ) -> Self {
         let connection = Connection::new(conn_topic, conn_config);
-        let e_meter = EMeter::new(influxdb, e_meter_topic, e_meter_config);
+        let e_meter = EMeter::new(influxdb, e_meter_config);
         TasmotaMeter {
             connection,
             e_meter,
@@ -128,10 +126,9 @@ struct Energy {
 }
 
 const Z1_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
-    device: DEVICE,
-    origin: ORIGIN,
-    components: &EMeterComponents {
-        e_in: &Sensor2 {
+    e_in: &TopicAndSensor {
+        topic: "homeassistant/sensor/simsys/e_meter_e_in_z1/config",
+        sensor: &Sensor {
             name: "Home Energy",
             platform: "sensor",
             unique_id: "z1-energy-in",
@@ -143,8 +140,12 @@ const Z1_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
             state_class: "total_increasing",
             value_template: "{{ value_json.e_in }}",
             suggested_display_precision: 0,
+            device: DEVICE
         },
-        e_out: &Sensor2 {
+    },
+    e_out: &TopicAndSensor {
+        topic: "homeassistant/sensor/simsys/e_meter_e_out_z1/config",
+        sensor: &Sensor {
             name: "Home Energy Output",
             platform: "sensor",
             unique_id: "z1-energy-out",
@@ -156,8 +157,12 @@ const Z1_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
             state_class: "total_increasing",
             value_template: "{{ value_json.e_out }}",
             suggested_display_precision: 0,
+            device: DEVICE,
         },
-        power: &Sensor2 {
+    },
+    power: &TopicAndSensor {
+        topic: "homeassistant/sensor/simsys/e_meter_power_z1/config",
+        sensor: &Sensor {
             name: "Home Power",
             platform: "sensor",
             unique_id: "z1-power",
@@ -169,8 +174,12 @@ const Z1_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
             state_class: "measurement",
             value_template: "{{ value_json.power }}",
             suggested_display_precision: 0,
+            device: DEVICE,
         },
-        sec_power: &Sensor2 {
+    },
+    sec_power: &TopicAndSensor {
+        topic: "homeassistant/sensor/simsys/e_meter_sec_power_z1/config",
+        sensor: &Sensor {
             name: "Home Sec Power",
             platform: "sensor",
             unique_id: "z1-sec-power",
@@ -182,10 +191,10 @@ const Z1_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
             state_class: "measurement",
             value_template: "{{ value_json.sec_power }}",
             suggested_display_precision: 0,
+            device: DEVICE,
         },
     },
 };
-const Z1_EMETER_CONFIG_TOPIC: &str = "homeassistant/device/simsys/e_meter_z1/config";
 
 const Z1_CONN_CONFIC: &BinarySensor = &BinarySensor {
     name: "Z1 Connection",
@@ -202,17 +211,15 @@ pub fn z1_emeter(influxdb: &InfluxDb) -> TasmotaMeter {
         influxdb,
         Z1_CONN_CONFIG_TOPIC,
         Z1_CONN_CONFIC,
-        Z1_EMETER_CONFIG_TOPIC,
         Z1_EMETER_CONFIG,
     )
 }
 
 const Z2_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
-    device: DEVICE,
-    origin: ORIGIN,
-    components: &EMeterComponents {
-        e_in: &Sensor2 {
-            name: "Grid Energy Input",
+    e_in: &TopicAndSensor {
+        topic: "homeassistant/sensor/simsys/e_meter_e_in_z2/config",
+        sensor: &Sensor {
+            name: "Home Energy",
             platform: "sensor",
             unique_id: "z2-energy-in",
             enabled_by_default: true,
@@ -223,12 +230,16 @@ const Z2_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
             state_class: "total_increasing",
             value_template: "{{ value_json.e_in }}",
             suggested_display_precision: 0,
+            device: DEVICE
         },
-        e_out: &Sensor2 {
-            name: "Grid Energy Output",
+    },
+    e_out: &TopicAndSensor {
+        topic: "homeassistant/sensor/simsys/e_meter_e_out_z2/config",
+        sensor: &Sensor {
+            name: "Home Energy Output",
             platform: "sensor",
             unique_id: "z2-energy-out",
-            enabled_by_default: true,
+            enabled_by_default: false,
             state_topic: "simsys/e_meter/z2/state",
             availability_topic: "simsys/e_meter/z2/avail",
             unit_of_measurement: "kWh",
@@ -236,9 +247,13 @@ const Z2_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
             state_class: "total_increasing",
             value_template: "{{ value_json.e_out }}",
             suggested_display_precision: 0,
+            device: DEVICE,
         },
-        power: &Sensor2 {
-            name: "Grid Power",
+    },
+    power: &TopicAndSensor {
+        topic: "homeassistant/sensor/simsys/e_meter_power_z2/config",
+        sensor: &Sensor {
+            name: "Home Power",
             platform: "sensor",
             unique_id: "z2-power",
             enabled_by_default: true,
@@ -249,9 +264,13 @@ const Z2_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
             state_class: "measurement",
             value_template: "{{ value_json.power }}",
             suggested_display_precision: 0,
+            device: DEVICE,
         },
-        sec_power: &Sensor2 {
-            name: "Grid Sec Power",
+    },
+    sec_power: &TopicAndSensor {
+        topic: "homeassistant/sensor/simsys/e_meter_sec_power_z2/config",
+        sensor: &Sensor {
+            name: "Home Sec Power",
             platform: "sensor",
             unique_id: "z2-sec-power",
             enabled_by_default: true,
@@ -262,10 +281,10 @@ const Z2_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
             state_class: "measurement",
             value_template: "{{ value_json.sec_power }}",
             suggested_display_precision: 0,
+            device: DEVICE,
         },
     },
 };
-const Z2_EMETER_CONFIG_TOPIC: &str = "homeassistant/device/simsys/e_meter_z2/config";
 
 const Z2_CONN_CONFIC: &BinarySensor = &BinarySensor {
     name: "Z2 Connection",
@@ -282,20 +301,18 @@ pub fn z2_emeter(influxdb: &InfluxDb) -> TasmotaMeter {
         influxdb,
         Z2_CONN_CONFIG_TOPIC,
         Z2_CONN_CONFIC,
-        Z2_EMETER_CONFIG_TOPIC,
         Z2_EMETER_CONFIG,
     )
 }
 
 const Z3_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
-    device: DEVICE,
-    origin: ORIGIN,
-    components: &EMeterComponents {
-        e_in: &Sensor2 {
-            name: "Solar Energy Input",
+    e_in: &TopicAndSensor {
+        topic: "homeassistant/sensor/simsys/e_meter_e_in_z3/config",
+        sensor: &Sensor {
+            name: "Home Energy",
             platform: "sensor",
             unique_id: "z3-energy-in",
-            enabled_by_default: false,
+            enabled_by_default: true,
             state_topic: "simsys/e_meter/z3/state",
             availability_topic: "simsys/e_meter/z3/avail",
             unit_of_measurement: "kWh",
@@ -303,12 +320,16 @@ const Z3_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
             state_class: "total_increasing",
             value_template: "{{ value_json.e_in }}",
             suggested_display_precision: 0,
+            device: DEVICE
         },
-        e_out: &Sensor2 {
-            name: "Solar Energy",
+    },
+    e_out: &TopicAndSensor {
+        topic: "homeassistant/sensor/simsys/e_meter_e_out_z3/config",
+        sensor: &Sensor {
+            name: "Home Energy Output",
             platform: "sensor",
             unique_id: "z3-energy-out",
-            enabled_by_default: true,
+            enabled_by_default: false,
             state_topic: "simsys/e_meter/z3/state",
             availability_topic: "simsys/e_meter/z3/avail",
             unit_of_measurement: "kWh",
@@ -316,9 +337,13 @@ const Z3_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
             state_class: "total_increasing",
             value_template: "{{ value_json.e_out }}",
             suggested_display_precision: 0,
+            device: DEVICE,
         },
-        power: &Sensor2 {
-            name: "Solar Power",
+    },
+    power: &TopicAndSensor {
+        topic: "homeassistant/sensor/simsys/e_meter_power_z3/config",
+        sensor: &Sensor {
+            name: "Home Power",
             platform: "sensor",
             unique_id: "z3-power",
             enabled_by_default: true,
@@ -329,9 +354,13 @@ const Z3_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
             state_class: "measurement",
             value_template: "{{ value_json.power }}",
             suggested_display_precision: 0,
+            device: DEVICE,
         },
-        sec_power: &Sensor2 {
-            name: "Solar Sec Power",
+    },
+    sec_power: &TopicAndSensor {
+        topic: "homeassistant/sensor/simsys/e_meter_sec_power_z3/config",
+        sensor: &Sensor {
+            name: "Home Sec Power",
             platform: "sensor",
             unique_id: "z3-sec-power",
             enabled_by_default: true,
@@ -342,10 +371,10 @@ const Z3_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
             state_class: "measurement",
             value_template: "{{ value_json.sec_power }}",
             suggested_display_precision: 0,
+            device: DEVICE,
         },
     },
 };
-const Z3_EMETER_CONFIG_TOPIC: &str = "homeassistant/device/simsys/e_meter_z3/config";
 
 const Z3_CONN_CONFIC: &BinarySensor = &BinarySensor {
     name: "Z3 Connection",
@@ -362,7 +391,6 @@ pub fn z3_emeter(influxdb: &InfluxDb) -> TasmotaMeter {
         influxdb,
         Z3_CONN_CONFIG_TOPIC,
         Z3_CONN_CONFIC,
-        Z3_EMETER_CONFIG_TOPIC,
         Z3_EMETER_CONFIG,
     )
 }
