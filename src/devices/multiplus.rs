@@ -35,22 +35,27 @@ impl PiController {
         }
     }
 
-    pub fn update(&mut self, error: f64) -> f64 {
-        // 1. Integralanteil aufsummieren
-        self.esum += error * self.ta;
+    pub fn update(&mut self, error: f64, bat_state: BatteryState) -> f64 {
+        if bat_state == BatteryState::IsEmpty || bat_state == BatteryState::IsFull {
+            self.esum = 0.0;
+            0.0
+        } else {
+            // 1. Integralanteil aufsummieren
+            self.esum += error * self.ta;
 
-        // 2. PI-Gleichung
-        let mut u = self.kp * (error + (self.esum / self.tn));
+            // 2. PI-Gleichung
+            let mut u = self.kp * (error + (self.esum / self.tn));
 
-        // 3. Anti-Windup / Begrenzung
-        if u > self.max_u {
-            u = self.max_u;
-            self.esum -= error * self.ta;
-        } else if u < self.min_u {
-            u = self.min_u;
-            self.esum -= error * self.ta;
+            // 3. Anti-Windup / Begrenzung
+            if u > self.max_u {
+                u = self.max_u;
+                self.esum -= error * self.ta;
+            } else if u < self.min_u {
+                u = self.min_u;
+                self.esum -= error * self.ta;
+            }
+            u
         }
-        u
     }
 }
 
@@ -228,13 +233,7 @@ impl Multiplus {
     }
 
     pub async fn controller(&mut self, error_p: f64) -> MqttMessages {
-        let mut cv = self.pi_controller.update(-error_p);
-
-        // Bat is full -> do not charge anymore
-        if self.battery.is_full() && cv > 0.0 {
-            cv = 0.0
-        }
-        // trace!("cv {} grid_p {} pi_control {:?}", cv, grid_p, self.pi_controller);
+        let mut cv = self.pi_controller.update(-error_p, self.battery.state());
 
         // Set inverter power
         let _ = self.set_power(cv).await;

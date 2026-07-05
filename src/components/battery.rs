@@ -6,6 +6,13 @@ use log::*;
 
 const MAX_TICK: u32 = 60;
 
+#[derive(PartialEq)]
+pub enum BatteryState {
+    IsFull,
+    IsEmpty,
+    FullReady,
+}
+
 pub struct Battery {
     soc: f64,
     tick: u32,
@@ -74,20 +81,36 @@ impl Battery {
     pub fn is_full(&mut self) -> bool {
         let now = chrono::Local::now();
         let weekday = now.weekday();
-        let mut soc = self.soc;
-        if self.was_full {
-            soc += 0.5;
-        }
         let is_full = match now.month() {
             // in june and july, bat will only charged to 100% on mondays
             6|7 => match now.weekday() {
-                chrono::Weekday::Mon => soc > 99.5,
-                _ => soc > 85.0
+                chrono::Weekday::Mon => self.soc > 99.5,
+                _ => if self.was_full {  // 1% hysteresis
+                    self.soc > 84.5
+                } else {
+                    self.soc > 85.5
+                }            
             }
-            _ => soc > 99.5
+            _ => self.soc > 99.5
         };
         self.was_full = is_full;
         is_full
+    }
+
+    #[allow(unused)]
+    pub fn is_empty(&self) -> bool {
+        self.soc < 5.1
+    }
+    
+    #[allow(unused)]
+    pub fn state(&mut self) -> BatteryState {
+        if self.is_full() {
+            BatteryState::IsFull
+        } else if self.is_empty() {
+            BatteryState::IsEmpty
+        } else {
+            BatteryState::FullReady
+        }
     }
 
     #[allow(unused)]
@@ -113,7 +136,7 @@ impl Battery {
 
         MqttMessage::new(
             self.config.payload.state_topic,
-            format!(r#"{{"soc": {}}}"#, self.soc.round()),
+            format!(r#"{{"soc": {:.0}}}"#, self.soc),
         )
     }
 }
