@@ -65,7 +65,7 @@ pub struct Devices {
     heatpump: Heatpump,
     wallbox: Wallbox,
     cnt: u32,
-    info_online: bool,
+    ok_conns: Vec<&'static str>,
 }
 
 impl Devices {
@@ -79,7 +79,7 @@ impl Devices {
             heatpump: heatpump(influxdb),
             wallbox: wallbox_meter(influxdb),
             cnt: 0,
-            info_online: false,
+            ok_conns: Vec::new(),
         }
     }
 
@@ -176,21 +176,19 @@ impl Devices {
 
         self.cnt = (self.cnt + 1) & 0x07;
         if self.cnt & 0x07 == 0x07 {
-            if error_cons.is_empty() {
-                if !self.info_online {
+            if ok_conns != self.ok_conns {
+                if error_cons.is_empty() {
                     info!("All devices are online");
-                    self.info_online = true;
+                } else {
+                    error!(
+                        "Devices offline: {}; online: {}",
+                        error_cons.join(", "),
+                        ok_conns.join(", ")
+                    );
                 }
-            } else {
-                error!(
-                    "Devices offline: {}; online: {}",
-                    error_cons.join(", "),
-                    ok_conns.join(", ")
-                );
-                self.info_online = false;
+                self.ok_conns = ok_conns;
             }
         }
-
         msgs
     }
 
