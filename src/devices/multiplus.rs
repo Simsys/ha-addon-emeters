@@ -36,8 +36,13 @@ impl PiController {
     }
 
     pub fn update(&mut self, error: f64, bat_state: BatteryState) -> f64 {
-        if bat_state == BatteryState::IsEmpty || bat_state == BatteryState::IsFull {
-            self.esum = 0.0;
+        let u = if bat_state == BatteryState::IsEmpty && error > 0.0 {
+            // Can't discharge a empty battery
+            self.esum = 0.0; // Clear the integrator portion
+            0.0
+        } else if bat_state == BatteryState::IsFull && error < 0.0 {
+            // Can't charge a full battery
+            self.esum = 0.0; // Clear the integrator portion
             0.0
         } else {
             // 1. Integralanteil aufsummieren
@@ -55,7 +60,8 @@ impl PiController {
                 self.esum -= error * self.ta;
             }
             u
-        }
+        };
+        u
     }
 }
 

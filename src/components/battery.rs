@@ -6,7 +6,7 @@ use log::*;
 
 const MAX_TICK: u32 = 60;
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Debug)]
 pub enum BatteryState {
     IsFull,
     IsEmpty,
