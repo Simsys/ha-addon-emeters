@@ -82,8 +82,8 @@ impl Battery {
         let now = chrono::Local::now();
         let weekday = now.weekday();
         let is_full = match now.month() {
-            // in june and july, bat will only charged to 100% on mondays
-            6|7 => match now.weekday() {
+            // Battery care: May to September
+            5|6|7|8 => match now.weekday() {
                 chrono::Weekday::Mon => self.soc > 99.5,
                 _ => if self.was_full {  // 1% hysteresis
                     self.soc > 84.5
