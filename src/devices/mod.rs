@@ -101,6 +101,7 @@ impl Devices {
             "go-eCharger/083205/nrg",
             "tasmota/electricity-meter/+/SENSOR",
             "simsys/switch/wallbox/no_solar_cmd",
+            "homeassistant/sensor/meter_pro_co2_368e_temperatur/state",
         ]
     }
 
@@ -202,6 +203,7 @@ impl Devices {
             "go-eCharger/083205/nrg" => self.wallbox.value_from_nrg(payload).await,
             "go-eCharger/083205/car" => self.wallbox.value_from_car(payload).await,
             "simsys/switch/wallbox/no_solar_cmd" => self.wallbox.no_solar_switch(payload).await,
+            "homeassistant/sensor/meter_pro_co2_368e_temperatur/state" => self.multiplus.battery().set_room_temp(payload).await,
 
             _ => MqttMessages::new(),
         }

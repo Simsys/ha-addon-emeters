@@ -1,7 +1,8 @@
 use super::{InfluxDb, PhysicalQuantity};
 use crate::utils::*;
 use crate::utils::{MqttMessage, MqttMessages};
-use chrono::Datelike;
+use serde_json::Value;
+use chrono::{Datelike, NaiveTime};
 use log::*;
 
 const MAX_TICK: u32 = 60;
@@ -10,13 +11,22 @@ const MAX_TICK: u32 = 60;
 pub enum BatteryState {
     IsFull,
     IsEmpty,
-    FullReady,
+    FullReady,  // Not full and not empty
+}
+
+#[derive(PartialEq, Debug)]
+pub enum Target {
+    ChargeLevel85,
+    ChargeLevel100PeekThan85,
+    ChargeLevel100,
 }
 
 pub struct Battery {
     soc: f64,
     tick: u32,
     was_full: bool,
+    target: Target,
+    room_temperature: f64,
 
     influxdb: InfluxDb,
     config: &'static SensorConfig,
@@ -31,6 +41,8 @@ impl Battery {
             soc: 0.0,
             tick: 0,
             was_full: false,
+            target: Target::ChargeLevel85,
+            room_temperature: 20.0,
             influxdb: influxdb.clone(),
             config,
         }
@@ -78,20 +90,52 @@ impl Battery {
     }
 
     #[allow(unused)]
-    pub fn is_full(&mut self) -> bool {
+    pub fn tick_1hz(&mut self) {
         let now = chrono::Local::now();
-        let weekday = now.weekday();
-        let is_full = match now.month() {
-            // Battery care: May to September
-            5|6|7|8 => match now.weekday() {
-                chrono::Weekday::Mon => self.soc > 99.5,
-                _ => if self.was_full {  // 1% hysteresis
+        let start_time = NaiveTime::from_hms_opt(4, 0, 0).unwrap();
+        let end_time = NaiveTime::from_hms_opt(4, 0, 3).unwrap();
+        if now.time() >= start_time && now.time() <= end_time {
+            self.target = if now.weekday() == chrono::Weekday::Mon 
+                { Target::ChargeLevel100PeekThan85 } 
+            else 
+                { Target::ChargeLevel85 };
+            if self.room_temperature < 22.5 {
+                self.target = Target::ChargeLevel100;
+            }
+            trace!("Set new battery target {:?}", self.target);
+        } 
+    }
+
+    pub async fn set_room_temp(&mut self, payload: &[u8]) -> MqttMessages {
+        if let Ok(number) = serde_json::from_slice::<Value>(payload) {
+            if let Some(temperature) = number.as_f64() {
+                self.room_temperature = temperature;
+                trace!("Room temperature {}", self.room_temperature);
+            }
+        }
+        MqttMessages::new()
+    }
+
+    #[allow(unused)]
+    pub fn is_full(&mut self) -> bool {
+        let is_full = match self.target {
+            Target::ChargeLevel100PeekThan85 => {
+                if self.soc > 99.5 {
+                    self.target = Target::ChargeLevel85;
+                    true
+                } else {
+                    false
+                }
+            },
+            Target::ChargeLevel85 => {
+                if self.was_full {  // 1% hysteresis
                     self.soc > 84.5
                 } else {
                     self.soc > 85.5
                 }            
-            }
-            _ => self.soc > 99.5
+
+            },
+            Target::ChargeLevel100 => self.soc > 99.5,
         };
         self.was_full = is_full;
         is_full
@@ -115,7 +159,10 @@ impl Battery {
 
     #[allow(unused)]
     pub fn enough_for_car(&self) -> bool {
-        self.soc > 49.5
+        match self.target {
+            Target::ChargeLevel100 => self.soc > 64.5,
+            Target::ChargeLevel100PeekThan85 | Target::ChargeLevel85 => self.soc > 49.5,
+        }
     }
 
     async fn set_soc(&mut self, soc: f64, write_to_db: bool) -> MqttMessage {

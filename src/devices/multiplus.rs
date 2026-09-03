@@ -161,8 +161,8 @@ impl Multiplus {
         &self.e_meter
     }
 
-    pub fn battery(&self) -> &Battery {
-        &self.battery
+    pub fn battery(&mut self) -> &mut Battery {
+        &mut self.battery
     }
 
     /// Has to be called once a second
@@ -177,6 +177,8 @@ impl Multiplus {
         } else {
             false
         };
+
+        self.battery().tick_1hz();
 
         // handle the connection ticker with the correct state
         let mut msgs = self.connection.set_state(state);
