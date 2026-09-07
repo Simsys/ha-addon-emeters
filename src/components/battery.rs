@@ -10,8 +10,9 @@ const MAX_TICK: u32 = 60;
 #[derive(PartialEq, Debug)]
 pub enum BatteryState {
     IsFull,
+    EnoughForCar,
+    NotEnoughForCar,
     IsEmpty,
-    FullReady,  // Not full and not empty
 }
 
 #[derive(PartialEq, Debug)]
@@ -25,6 +26,7 @@ pub struct Battery {
     soc: f64,
     tick: u32,
     was_full: bool,
+    was_enough: bool,
     target: Target,
     room_temperature: f64,
 
@@ -41,6 +43,7 @@ impl Battery {
             soc: 0.0,
             tick: 0,
             was_full: false,
+            was_enough: false,
             target: Target::ChargeLevel85,
             room_temperature: 20.0,
             influxdb: influxdb.clone(),
@@ -95,10 +98,12 @@ impl Battery {
         let start_time = NaiveTime::from_hms_opt(4, 0, 0).unwrap();
         let end_time = NaiveTime::from_hms_opt(4, 0, 3).unwrap();
         if now.time() >= start_time && now.time() <= end_time {
-            self.target = if now.weekday() == chrono::Weekday::Mon 
+            self.target = if now.weekday() == chrono::Weekday::Mon || 
+                            self.target == Target::ChargeLevel100PeekThan85
                 { Target::ChargeLevel100PeekThan85 } 
-            else 
-                { Target::ChargeLevel85 };
+            else {
+                Target::ChargeLevel85 
+            };
             if self.room_temperature < 22.5 {
                 self.target = Target::ChargeLevel100;
             }
@@ -141,28 +146,35 @@ impl Battery {
         is_full
     }
 
+    pub fn enough_for_car(&mut self) -> bool {
+        let limit = match self.target {
+            Target::ChargeLevel100 => 64.5,
+            Target::ChargeLevel100PeekThan85 | Target::ChargeLevel85 => 49.5,
+        };
+        let is_enough = if self.was_enough {
+            self.soc > limit
+        } else {
+            self.soc > limit + 1.0
+        };
+        self.was_enough = is_enough;
+        is_enough 
+    }
+
     #[allow(unused)]
     pub fn is_empty(&self) -> bool {
         self.soc < 5.1
     }
     
-    #[allow(unused)]
     pub fn state(&mut self) -> BatteryState {
         if self.is_full() {
             BatteryState::IsFull
         } else if self.is_empty() {
             BatteryState::IsEmpty
-        } else {
-            BatteryState::FullReady
-        }
-    }
-
-    #[allow(unused)]
-    pub fn enough_for_car(&self) -> bool {
-        match self.target {
-            Target::ChargeLevel100 => self.soc > 64.5,
-            Target::ChargeLevel100PeekThan85 | Target::ChargeLevel85 => self.soc > 49.5,
-        }
+        } else if self.enough_for_car() {
+            BatteryState::EnoughForCar
+            } else {
+                BatteryState::NotEnoughForCar
+            }
     }
 
     async fn set_soc(&mut self, soc: f64, write_to_db: bool) -> MqttMessage {

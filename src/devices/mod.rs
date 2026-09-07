@@ -134,13 +134,16 @@ impl Devices {
             let household_p = home_p - solar_p - wallbox_p - multiplus_p;
             msgs += self.household.set_sec_power(household_p).await;
 
-            // Call car controller with power available
-            let mut avail_p = grid_p - multiplus_p - wallbox_p;
-            if avail_p < 1600.0 && self.multiplus.battery().enough_for_car() {
-                // if battery has enough energy for car, use it to charge it
-                avail_p += 3000.0;
+            // Car surplus charging only, when home battery has a minimum level
+            if self.multiplus.battery().enough_for_car() {
+                let mut avail_p = grid_p - multiplus_p - wallbox_p;
+                if avail_p < 1600.0 {
+                    // if battery has enough energy for car, use it to charge it
+                    avail_p += 3000.0;
+                }
+                // Call car controller with power available
+                msgs += self.wallbox.control(avail_p).await;
             }
-            msgs += self.wallbox.control(avail_p).await;
 
             // Call Homebat controller, try to neutralise power consumption
             let error_p = grid_p + if solar_p > 1000.0 { -100.0 } else { -20.0 };
