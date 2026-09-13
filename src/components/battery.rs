@@ -154,7 +154,7 @@ impl Battery {
         let is_enough = if self.was_enough {
             self.soc > limit
         } else {
-            self.soc > limit + 1.0
+            self.soc > limit + 3.0
         };
         self.was_enough = is_enough;
         is_enough 
