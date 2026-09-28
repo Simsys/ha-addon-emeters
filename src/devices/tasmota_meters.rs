@@ -219,7 +219,7 @@ const Z2_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
     e_in: &SensorConfig {
         topic: "homeassistant/sensor/simsys/e_meter_e_in_z2/config",
         payload: &Sensor {
-            name: "Home Energy",
+            name: "Grid Energy",
             platform: "sensor",
             unique_id: "z2-energy-in",
             enabled_by_default: true,
@@ -236,7 +236,7 @@ const Z2_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
     e_out: &SensorConfig {
         topic: "homeassistant/sensor/simsys/e_meter_e_out_z2/config",
         payload: &Sensor {
-            name: "Home Energy Output",
+            name: "Grid Energy Output",
             platform: "sensor",
             unique_id: "z2-energy-out",
             enabled_by_default: false,
@@ -253,7 +253,7 @@ const Z2_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
     power: &SensorConfig {
         topic: "homeassistant/sensor/simsys/e_meter_power_z2/config",
         payload: &Sensor {
-            name: "Home Power",
+            name: "Grid Power",
             platform: "sensor",
             unique_id: "z2-power",
             enabled_by_default: true,
@@ -270,7 +270,7 @@ const Z2_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
     sec_power: &SensorConfig {
         topic: "homeassistant/sensor/simsys/e_meter_sec_power_z2/config",
         payload: &Sensor {
-            name: "Home Sec Power",
+            name: "Grid Sec Power",
             platform: "sensor",
             unique_id: "z2-sec-power",
             enabled_by_default: true,
@@ -310,7 +310,7 @@ const Z3_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
     e_in: &SensorConfig {
         topic: "homeassistant/sensor/simsys/e_meter_e_in_z3/config",
         payload: &Sensor {
-            name: "Home Energy",
+            name: "Solar Energy",
             platform: "sensor",
             unique_id: "z3-energy-in",
             enabled_by_default: true,
@@ -327,7 +327,7 @@ const Z3_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
     e_out: &SensorConfig {
         topic: "homeassistant/sensor/simsys/e_meter_e_out_z3/config",
         payload: &Sensor {
-            name: "Home Energy Output",
+            name: "Solar Energy Output",
             platform: "sensor",
             unique_id: "z3-energy-out",
             enabled_by_default: false,
@@ -344,7 +344,7 @@ const Z3_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
     power: &SensorConfig {
         topic: "homeassistant/sensor/simsys/e_meter_power_z3/config",
         payload: &Sensor {
-            name: "Home Power",
+            name: "Solar Power",
             platform: "sensor",
             unique_id: "z3-power",
             enabled_by_default: true,
@@ -361,7 +361,7 @@ const Z3_EMETER_CONFIG: &ConstEMeter = &ConstEMeter {
     sec_power: &SensorConfig {
         topic: "homeassistant/sensor/simsys/e_meter_sec_power_z3/config",
         payload: &Sensor {
-            name: "Home Sec Power",
+            name: "Solar Sec Power",
             platform: "sensor",
             unique_id: "z3-sec-power",
             enabled_by_default: true,
